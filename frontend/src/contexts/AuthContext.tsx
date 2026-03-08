@@ -42,8 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         })
         .catch(() => {
-          // Token inválido
-          logout();
+          // Token inválido, fazer logout
+          setUser(null);
+          setToken(null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
         })
         .finally(() => {
           setLoading(false);
@@ -58,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(authToken);
     localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(userData));
-    axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+    // Token será adicionado automaticamente pelo interceptor do axiosInstance
   };
 
   const logout = () => {
@@ -66,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
+    // Token será removido automaticamente nas próximas requisições
   };
 
   return (
