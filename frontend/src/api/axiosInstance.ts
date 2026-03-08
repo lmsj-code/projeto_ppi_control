@@ -1,10 +1,5 @@
 import axios from 'axios';
 
-// Tipo para variáveis de ambiente do Vite
-interface ImportMetaEnv {
-  readonly VITE_API_URL?: string;
-}
-
 // Determinar a URL da API baseado no ambiente
 const apiUrl = (import.meta as any).env?.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:3001`;
 
