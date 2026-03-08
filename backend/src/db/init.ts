@@ -11,6 +11,9 @@ export async function initDatabase(): Promise<void> {
   const client = await pool.connect();
 
   try {
+    // Iniciar transação
+    await client.query('BEGIN');
+
     // Projects table
     await client.query(`
       CREATE TABLE IF NOT EXISTS projects (
@@ -183,6 +186,14 @@ export async function initDatabase(): Promise<void> {
     }
 
     console.log('✅ Database tables created');
+
+    // Confirmar transação
+    await client.query('COMMIT');
+  } catch (error) {
+    // Reverter transação em caso de erro
+    await client.query('ROLLBACK').catch(() => {});
+    console.error('❌ Database initialization failed:', error);
+    throw error;
   } finally {
     client.release();
   }

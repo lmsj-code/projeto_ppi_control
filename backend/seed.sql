@@ -1,8 +1,15 @@
 -- PPI Control - Dados de Demonstração
 -- Projeto: Residência Tecnológica em Software
 
--- Limpar dados existentes
+-- Limpar dados existentes (mas não users)
 TRUNCATE TABLE feed_logs, compliance_checks, risks, payments, purchases, channel_messages, documents, tasks, projects CASCADE;
+
+-- Garantir que usuários de teste existem
+INSERT INTO users (name, email, password, role, created_at, updated_at)
+VALUES 
+  ('Administrador', 'admin@ppi.control', '$2b$10$FRgjXEoeuc.BeVbs6ypOU.rHCOtVV.Mz/VD1CQ8R7XEpDrajGsx5u', 'admin', NOW(), NOW()),
+  ('Usuário Demo', 'demo@ppi.control', '$2b$10$Jwrnukzn6UGfJaLMuAZpC.Z/Y/QBTwPckdvASqMyOYsnImlRrYWu2', 'user', NOW(), NOW())
+ON CONFLICT (email) DO NOTHING;
 
 -- ============================================
 -- PROJETOS (sem UUID fixo - PostgreSQL gera automaticamente)

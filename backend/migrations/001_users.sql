@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Inserir usuário admin padrão (senha: admin123)
-INSERT INTO users (name, email, password, role)
-VALUES ('Administrador', 'admin@ppi.control', '$2a$10$X5wFWMLGZqVKrCQqJQJQJOK9J8K9K9K9K9K9K9K9K9K9K9K9K9K9', 'admin')
+INSERT INTO users (name, email, password, role, created_at, updated_at)
+VALUES ('Administrador', 'admin@ppi.control', '$2b$10$FRgjXEoeuc.BeVbs6ypOU.rHCOtVV.Mz/VD1CQ8R7XEpDrajGsx5u', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (email) DO NOTHING;
 
 -- Criar usuário de demonstração (senha: demo123)
-INSERT INTO users (name, email, password, role)
-VALUES ('Demo User', 'demo@ppi.control', '$2a$10$X5wFWMLGZqVKrCQqJQJQJOK9J8K9K9K9K9K9K9K9K9K9K9K9K9K9K9', 'user')
+INSERT INTO users (name, email, password, role, created_at, updated_at)
+VALUES ('Usuário Demo', 'demo@ppi.control', '$2b$10$Jwrnukzn6UGfJaLMuAZpC.Z/Y/QBTwPckdvASqMyOYsnImlRrYWu2', 'user', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT (email) DO NOTHING;
