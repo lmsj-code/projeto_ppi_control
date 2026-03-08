@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
 interface User {
   id: string;
@@ -33,11 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(savedToken);
       setUser(JSON.parse(savedUser));
 
-      // Configurar axios com token
-      axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
-
       // Verificar se token é válido
-      axios.get('/api/auth/verify')
+      axiosInstance.get('/auth/verify')
         .then(res => {
           if (res.data.success) {
             setUser(res.data.user);

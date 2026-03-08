@@ -161,21 +161,25 @@ export async function initDatabase(): Promise<void> {
     // Create default admin user if not exists
     const adminExists = await client.query("SELECT id FROM users WHERE email = 'admin@ppi.control'");
     if (adminExists.rows.length === 0) {
+      // Password: admin123 (hashed with bcrypt salt 10)
       const hashedPassword = '$2b$10$FRgjXEoeuc.BeVbs6ypOU.rHCOtVV.Mz/VD1CQ8R7XEpDrajGsx5u';
       await client.query(`
-        INSERT INTO users (name, email, password, role)
-        VALUES ('Administrador', 'admin@ppi.control', $1, 'admin')
-      `, [hashedPassword]);
+        INSERT INTO users (name, email, password, role, created_at)
+        VALUES ('Administrador', 'admin@ppi.control', $1, 'admin', $2)
+      `, [hashedPassword, new Date()]);
+      console.log('✅ Admin user created: admin@ppi.control / admin123');
     }
 
     // Create demo user if not exists
     const demoExists = await client.query("SELECT id FROM users WHERE email = 'demo@ppi.control'");
     if (demoExists.rows.length === 0) {
+      // Password: demo123 (hashed with bcrypt salt 10)
       const hashedPassword = '$2b$10$Jwrnukzn6UGfJaLMuAZpC.Z/Y/QBTwPckdvASqMyOYsnImlRrYWu2';
       await client.query(`
-        INSERT INTO users (name, email, password, role)
-        VALUES ('Usuário Demo', 'demo@ppi.control', $1, 'user')
-      `, [hashedPassword]);
+        INSERT INTO users (name, email, password, role, created_at)
+        VALUES ('Usuário Demo', 'demo@ppi.control', $1, 'user', $2)
+      `, [hashedPassword, new Date()]);
+      console.log('✅ Demo user created: demo@ppi.control / demo123');
     }
 
     console.log('✅ Database tables created');

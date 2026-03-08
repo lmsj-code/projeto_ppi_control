@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { HardHat, Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
 interface LoginProps {
   onLogin: (user: any, token: string) => void;
@@ -21,10 +21,10 @@ export default function Login({ onLogin }: LoginProps) {
     setLoading(true);
 
     try {
-      const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+      const endpoint = isRegister ? '/auth/register' : '/auth/login';
       const payload = isRegister ? { name, email, password } : { email, password };
 
-      const response = await axios.post(endpoint, payload);
+      const response = await axiosInstance.post(endpoint, payload);
 
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
