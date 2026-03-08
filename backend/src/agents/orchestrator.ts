@@ -6,7 +6,18 @@ export interface AgentMessage {
     target?: string;
     priority?: number;
     metadata?: Record<string, any>;
-    [key: string]: any; // Permite qualquer outra propriedade extra
+    [key: string]: any;
+}
+
+export interface FeedLogEntry {
+    id: string;
+    projectId?: string;
+    taskId?: string;
+    agent: string;
+    category: string;
+    action: string;
+    details: any;
+    timestamp?: Date;
 }
 
 export class AgentOrchestrator {
@@ -27,20 +38,51 @@ export class AgentOrchestrator {
         console.log("🚀 Orchestrator iniciado com sucesso.");
     }
 
-    // Método para os agentes registrarem logs no feed central
-    // O '?' garante que aceite 1 ou 2 argumentos (TS2554)
-    logToFeed(message: string, agentName?: string): void {
+    // Método para os agentes registrarem logs no feed central - Overloads
+    logToFeed(log: FeedLogEntry): void;
+    logToFeed(message: string, agentName?: string): void;
+    logToFeed(messageOrLog: any, agentName?: string): void {
         const timestamp = new Date().toISOString();
-        const sender = agentName || 'System';
-        console.log(`[${timestamp}] [${sender}]: ${message}`);
+        
+        if (typeof messageOrLog === 'string') {
+            // Forma simples - string com agente opcional
+            const sender = agentName || 'System';
+            console.log(`[${timestamp}] [${sender}]: ${messageOrLog}`);
+        } else if (typeof messageOrLog === 'object' && messageOrLog !== null) {
+            // Forma estruturada - objeto com log completo
+            console.log(`[${timestamp}] Feed Log:`, JSON.stringify(messageOrLog, null, 2));
+            // TODO: Inserir no banco de dados (feed_logs table)
+        } else {
+            console.log(`[${timestamp}] Invalid log entry type`);
+        }
     }
 
-    // Método para comunicação em massa (exigido pelo leader e messenger)
-    broadcast(message: AgentMessage, sender?: string): void {
-        console.log(`📢 Broadcast de ${sender || 'Desconhecido'}: ${message.action}`);
+    // Método para comunicação em massa - Overloads
+    broadcast(message: AgentMessage, sender?: string): void;
+    broadcast(action: string, payload?: any, sender?: string): void;
+    broadcast(messageOrAction: any, payload?: any, sender?: string): void;
+    broadcast(messageOrAction: any, payload?: any, sender?: string): void {
+        const timestamp = new Date().toISOString();
+        
+        if (typeof messageOrAction === 'string') {
+            // Forma simples - action string com payload opcional
+            const action = messageOrAction;
+            const senderId = sender || 'System';
+            console.log(`[${timestamp}] 📢 Broadcast "${action}" de ${senderId}`);
+            if (payload) {
+                console.log(`  Payload: ${JSON.stringify(payload).substring(0, 100)}...`);
+            }
+        } else if (typeof messageOrAction === 'object' && messageOrAction !== null) {
+            // Forma estruturada - AgentMessage
+            const msg = messageOrAction;
+            const senderId = sender || msg.sender || 'System';
+            console.log(`[${timestamp}] 📢 Broadcast "${msg.action || 'unknown'}" de ${senderId}`);
+        }
     }
 
-    // Método para envio direcionado (exigido pelo spreadsheet e leader)
+    // Método para envio direcionado - Overloads
+    async routeMessage(message: AgentMessage): Promise<any>;
+    async routeMessage(target: string, message: AgentMessage): Promise<any>;
     async routeMessage(targetOrMessage: any, message?: any): Promise<any> {
         // Lógica flexível: se receber 2 args é (destino, msg), se 1 é a msg com target interno
         const target = message ? targetOrMessage : targetOrMessage.target;
